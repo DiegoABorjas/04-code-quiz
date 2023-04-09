@@ -5,10 +5,11 @@ const optionsContainer = document.getElementById('options-container');
 var timeElement = document.getElementById('time')
 
 // Initialize logic variables
-var selectedAnswer = '';
+var currentQuestionIndex;
 var secondsLeft = 60;
 var score = 0;
 
+// Array of questions
 const questionsArray = [
     {
         id: 1,
@@ -35,62 +36,16 @@ function beginQuiz() {
 
     // Start timer
     setTime();
-
-    // Creating buttons for quiz
-    var choiceButtonOne = document.createElement("button");
-    var choiceButtonTwo = document.createElement("button");
-    var choiceButtonThree = document.createElement("button");
-    var choiceButtonFour = document.createElement("button");
-
     // Remove start button when the quiz begins 
-    startButton.style.display = 'none'
-
-    // Loop through questions array
-    for (var i=0; i<questionsArray.length; i++) {
-        
-        //If no time left end quiz
-        if (secondsLeft <= 0) {
-            console.log('Time is over!')
-            return
-        }
-
-        // Show question to user
-        questionBox.innerText = questionsArray[i].question
-
-        // Assign choices to buttons and show them to user
-        choiceButtonOne.textContent = questionsArray[i].options[0]
-        optionsContainer.appendChild(choiceButtonOne)
-
-        choiceButtonTwo.textContent = questionsArray[i].options[1]
-        optionsContainer.appendChild(choiceButtonTwo)
-
-        choiceButtonThree.textContent = questionsArray[i].options[2]
-        optionsContainer.appendChild(choiceButtonThree)
-
-        choiceButtonFour.textContent = questionsArray[i].options[3]
-        optionsContainer.appendChild(choiceButtonFour)
-
-        // When user selects option check answer & update score & time
-        optionsContainer.addEventListener('click', function(event) {
-            const isButton = event.target.nodeName === 'BUTTON';
-            if (!isButton) return;
-
-            console.log(event.target.textContent)
-
-        })
-        
-
-
-
-        // If there's time left, show another set of questions.
-        
-        console.log(questionsArray[i])
-
-    }
+    startButton.style.display = 'none';
+    // Set the initial question index of the questions array.
+    currentQuestionIndex = 0
+    // Begin showing questions
+    setNextQuestion();
 
 }
 
-// Function tp set the timer
+// Function to set the timer
 function setTime() {
     var timeInterval = setInterval(function() {
         secondsLeft--;
@@ -101,6 +56,50 @@ function setTime() {
         }
     }, 1000)
 }
+
+//Function to show a question
+function showQuestion(question) {
+    // Show question title
+    questionBox.innerText = question.question;
+
+    question.options.forEach(option => {
+        const button = document.createElement("button");
+        button.innerText = option
+        optionsContainer.appendChild(button)
+    })
+    // When user selects option check answer & update score & time
+    optionsContainer.addEventListener('click', function(event) {
+        const isButton = event.target.nodeName === 'BUTTON';
+        if (!isButton) return;
+
+        console.log(checkAnswer(event.target.textContent, question.answer))
+        console.log(currentQuestionIndex)
+        if (currentQuestionIndex >= questionsArray.length) {
+            console.log('NO MORE QUESTIONS')
+            return
+        }
+        resetState();
+        setNextQuestion();
+
+    });
+};
+
+function setNextQuestion() {
+    showQuestion(questionsArray[currentQuestionIndex])
+    currentQuestionIndex++
+}
+
+function resetState() {
+    var btns = document.querySelectorAll('button')
+    for (button of btns) {
+        button.remove();
+    }
+
+
+}
+
+
+
 // Function to check if answer is correct or not
 function checkAnswer(selected, correct) {
     return selected === correct    
