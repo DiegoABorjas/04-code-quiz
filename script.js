@@ -2,11 +2,15 @@ const main = document.getElementById('main-container');
 const startButton = document.getElementById('begin-quiz');
 const questionBox = document.getElementById('question-container');
 const optionsContainer = document.getElementById('options-container');
+const finalScoreP = document.createElement('p');
+const initialsForm = document.createElement('form');
+const submitForm = document.getElementById('submit-form')
+const resultSection = document.getElementById('selection-result')
 var timeElement = document.getElementById('time')
 
 // Initialize logic variables
 var currentQuestionIndex;
-var secondsLeft = 20;
+var secondsLeft = 50;
 var score = 0;
 
 // Array of questions
@@ -59,7 +63,8 @@ function setNextQuestion() {
 function showQuestion(question) {
     // IF no more questions end quiz
     if (currentQuestionIndex >= questionsArray.length) {
-        return showFinalScore();
+        secondsLeft = 0;
+        return
     }
     // Show question title
     questionBox.innerText = question.question;
@@ -82,10 +87,12 @@ optionsContainer.addEventListener('click', function(event) {
     if (result) {
         score += 10;
         console.log('ANSWER CORRECT, NEW SCORE IS: ' + score)
+        resultSection.textContent = 'Correct!'
     // If wrong option selected, decrease timer by 10 seconds
     } else {
-        secondsLeft-=10
+        secondsLeft-=15
         console.log('ANSWER INCORRECT, NEW SCORE IS: ' + score)
+        resultSection.textContent = 'Wrong!'
     } 
     // After option selected reset the options container, increment the question index
     // & then set the next question
@@ -110,12 +117,46 @@ function checkAnswer(selected, correct) {
 // Show final score:
 function showFinalScore() {
     resetState();
-    console.log('End of Quiz reached');
+    secondsLeft = 0;
+    // const finalScoreP = document.createElement('p');
     questionBox.innerText = 'All done!';
-    const finalScoreP = document.createElement("p");
     finalScoreP.innerText = 'Your final score is: ' + score;
     optionsContainer.appendChild(finalScoreP);
+    resultSection.textContent = ''
+    showForm();
 }
+
+function showForm() {
+    // const initialsForm = document.createElement('form');
+    const formLabel = document.createElement('label');
+    formLabel.innerText = 'Enter initials:';
+    const formInput = document.createElement('input');
+    const submitButton = document.createElement('button');
+    submitButton.innerText = 'Submit';
+    submitButton.setAttribute('class','submit-button');
+    
+    initialsForm.appendChild(formLabel);
+    initialsForm.appendChild(formInput);
+    initialsForm.appendChild(submitButton);
+    submitForm.appendChild(initialsForm);
+
+    submitButton.addEventListener('click', function(event) {
+        event.preventDefault();
+
+        localStorage.setItem('initials', formInput.value)
+
+        showHighScores();
+    })
+}
+
+function showHighScores() {
+    resetState();
+    questionBox.innerText = 'High Scores';
+    finalScoreP.remove();
+    initialsForm.remove();
+
+}
+
 
 // Function to set the timer
 function setTime() {
@@ -125,10 +166,9 @@ function setTime() {
             secondsLeft = 0
         }
         timeElement.textContent = 'Time Left: ' + secondsLeft
-
         if (secondsLeft <= 0) {
             clearInterval(timeInterval)
-            return showFinalScore();    
+            return showFinalScore();
         }
     }, 1000)
 }

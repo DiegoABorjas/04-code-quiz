@@ -55,5 +55,19 @@ button:active {
     justify-content: center;
     align-items: center;
     gap: 1em;
+}
 
+.selection-result {
+    text-align: center;
+}
+
+input {
+    margin-left: 1em;
+    padding: 0.2em;
+}
+
+.submit-button {
+    background-color: red;
+    margin-left: 1em;
+    padding: 0.5em 1.5em;
 }
