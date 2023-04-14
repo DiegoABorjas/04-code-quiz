@@ -49,6 +49,7 @@ button:active {
     transform: translateY(2px);
 }
 
+/* options container */
 .options-container {
     display: flex;
     flex-direction: column;
@@ -57,17 +58,31 @@ button:active {
     gap: 1em;
 }
 
+/* selection result */
 .selection-result {
     text-align: center;
 }
+
 
 input {
     margin-left: 1em;
     padding: 0.2em;
 }
 
+/* button to submit score */
 .submit-button {
     background-color: red;
     margin-left: 1em;
     padding: 0.5em 1.5em;
+}
+
+/* ordered list */
+ol {
+    padding: 1em 8em;
+    background-color: var(--highlight);
+    list-style: none;
+}
+
+.submit-form button {
+    margin: 0.5em;
 }

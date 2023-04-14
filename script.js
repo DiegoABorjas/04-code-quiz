@@ -1,17 +1,26 @@
+// DOM element variables
+
 const main = document.getElementById('main-container');
+const header = document.getElementById('header');
 const startButton = document.getElementById('begin-quiz');
 const questionBox = document.getElementById('question-container');
 const optionsContainer = document.getElementById('options-container');
 const finalScoreP = document.createElement('p');
 const initialsForm = document.createElement('form');
-const submitForm = document.getElementById('submit-form')
-const resultSection = document.getElementById('selection-result')
-var timeElement = document.getElementById('time')
+const submitForm = document.getElementById('submit-form');
+const resultSection = document.getElementById('selection-result');
+var timeElement = document.getElementById('time');
+const highScoresList = document.createElement('ol');
+const submitButton = document.createElement('button');
+const formInput = document.createElement('input');
+
+
 
 // Initialize logic variables
 var currentQuestionIndex;
 var secondsLeft = 50;
 var score = 0;
+var highScoresArray = [];
 
 // Array of questions
 const questionsArray = [
@@ -107,6 +116,7 @@ function resetState() {
     for (button of btns) {
         button.remove();
     }
+    resultSection.textContent = ''
 }
 
 // Function to check if answer is correct or not
@@ -114,11 +124,10 @@ function checkAnswer(selected, correct) {
     return selected === correct    
 }
 
-// Show final score:
+// Function to show the final score 
 function showFinalScore() {
     resetState();
     secondsLeft = 0;
-    // const finalScoreP = document.createElement('p');
     questionBox.innerText = 'All done!';
     finalScoreP.innerText = 'Your final score is: ' + score;
     optionsContainer.appendChild(finalScoreP);
@@ -126,12 +135,10 @@ function showFinalScore() {
     showForm();
 }
 
+// Function to show the high scores form
 function showForm() {
-    // const initialsForm = document.createElement('form');
     const formLabel = document.createElement('label');
     formLabel.innerText = 'Enter initials:';
-    const formInput = document.createElement('input');
-    const submitButton = document.createElement('button');
     submitButton.innerText = 'Submit';
     submitButton.setAttribute('class','submit-button');
     
@@ -139,22 +146,82 @@ function showForm() {
     initialsForm.appendChild(formInput);
     initialsForm.appendChild(submitButton);
     submitForm.appendChild(initialsForm);
-
-    submitButton.addEventListener('click', function(event) {
-        event.preventDefault();
-
-        localStorage.setItem('initials', formInput.value)
-
-        showHighScores();
-    })
 }
 
-function showHighScores() {
+// Submit button event listener to save the score
+submitButton.addEventListener('click', function(event) {
+    event.preventDefault();
+    
+    var scoreText = formInput.value.trim() + ' - ' + score;
+
+    if (scoreText === '') {
+        return;
+    }
+    getScores();
+    highScoresArray.push(scoreText);
+
+    storeScores();
+    viewHighScores();
+})
+
+// Function to store scores in localStorage
+function storeScores() {
+    // Stringify and set key in localStorage to scores array
+    localStorage.setItem("scores", JSON.stringify(highScoresArray));
+}
+
+// Function to show the scores
+function viewHighScores() {
+    const goBack = document.createElement('button')
+    const clearScores = document.createElement('button')
+    getScores();
     resetState();
+    header.style.visibility = 'hidden';
     questionBox.innerText = 'High Scores';
     finalScoreP.remove();
     initialsForm.remove();
 
+    for (var i = 0; i < highScoresArray.length; i++) {
+        var scoreEntry = highScoresArray[i];
+        var li = document.createElement('li');
+        li.textContent = scoreEntry;
+        li.setAttribute('data-index', i);
+        highScoresList.appendChild(li);
+        optionsContainer.appendChild(highScoresList)
+    }
+    optionsContainer.appendChild(highScoresList)
+
+    goBack.textContent = 'Go Back'
+    clearScores.textContent = 'Clear Scores'
+    submitForm.appendChild(goBack);
+    submitForm.appendChild(clearScores);
+    
+
+    goBack.addEventListener('click', refreshPage)
+    clearScores.addEventListener('click', handleClearScores)
+
+}
+
+// Function to get the scores
+function getScores() {
+    // Get stored scores from localStorage
+    var storedScores = JSON.parse(localStorage.getItem("scores"));
+  
+    // If scores were retrieved from localStorage, update the scores array to it
+    if (storedScores !== null) {
+      highScoresArray = storedScores;
+    }
+  }
+
+// Function to reload page
+function refreshPage() {
+    location.reload();
+}
+
+// Function to clear high scores
+function handleClearScores() {
+    localStorage.clear();
+    highScoresList.remove();
 }
 
 
