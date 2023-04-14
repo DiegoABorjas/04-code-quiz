@@ -116,7 +116,7 @@ function resetState() {
     for (button of btns) {
         button.remove();
     }
-    resultSection.textContent = ''
+    // resultSection.textContent = ''
 }
 
 // Function to check if answer is correct or not
